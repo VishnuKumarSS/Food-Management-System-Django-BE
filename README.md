@@ -33,6 +33,14 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+#### 5. EMAIL SMTP server config
+
+Generate the App password in the Google account, and replace the email and 12 digit app password for the below key in .env
+```bash
+EMAIL_HOST_USER=gmail_host_user_email
+EMAIL_HOST_PASSWORD=gmail_host_app_password_12_digit
+```
+
 ## Server side utilities
 
 #### 1. Create normaluser and superuser:
@@ -49,3 +57,23 @@ python manage.py shell
 >>> User.objects.create_superuser(email="...", username="...", password="...")
 ```
 
+#### 2. Generate and Verify OTP
+```bash
+# Generate OTP
+API Method: POST
+API Endpoint: {{BASE_URL_BE}}/account/request-otp/
+Body:
+{
+    "email": "USER_EMAIL"
+}
+
+# Verify OTP
+API Method: POST
+API Endpoint: {{BASE_URL_BE}}/account/verify-otp/
+Body:
+{
+    "email": "USER_EMAIL",
+    "otp": "RECEIVED OTP"
+}
+
+```
