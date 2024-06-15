@@ -1,11 +1,17 @@
-from rest_framework import status
+from django.contrib.auth import get_user_model
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import OTP, User
-from .serializers import OTPRequestSerializer, OTPVerifySerializer
+from .serializers import (CustomTokenObtainPairSerializer,
+                          OTPRequestSerializer, OTPVerifySerializer,
+                          RegisterSerializer, UserDataSerializer)
 from .utils import generate_otp, send_otp_email
 
+User = get_user_model()
 
 class RequestOTP(APIView):
 
@@ -43,3 +49,22 @@ class VerifyOTP(APIView):
             return Response({'error': 'Invalid OTP or OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserDataSerializer
+
+    def get_object(self):
+        return self.request.user
