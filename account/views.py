@@ -53,7 +53,7 @@ class VerifyOTP(APIView):
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny,) # Explicitely defining the permission class
     serializer_class = RegisterSerializer
 
 
