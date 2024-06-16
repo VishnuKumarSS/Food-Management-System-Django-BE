@@ -67,7 +67,7 @@ Body:
     "email": "USER_EMAIL"
 }
 
-# Verify OTP
+# Verify OTP (Ignore this, Instead use Login User / Token Obtain API)
 API Method: POST
 API Endpoint: {{BASE_URL_BE}}/account/verify-otp/
 Body:
@@ -76,4 +76,57 @@ Body:
     "otp": "RECEIVED OTP"
 }
 
+```
+
+#### 3. Authentication APIs
+```bash
+# Create/Register User
+API Method: POST
+API Endpoint: {{BASE_URL_BE}}/account/api/register/
+Body:
+{
+    "username": "username",
+    "email": "useremail@gmail.com",
+    "password": "password"
+}
+
+# Login User / Token Obtain
+API Method: POST
+API Endpoint: {{BASE_URL_BE}}/account/api/token/
+Body:
+{
+    "email": "useremail@gmail.com",
+    "otp": "123456", # Required for the first time
+    "password": "password"
+}
+
+# Token refresh
+API Method: POST
+API Endpoint: {{BASE_URL_BE}}/account/api/token/refresh/
+Body:
+{
+    "refresh": "headers.payload.signature"
+}
+```
+
+#### 4. Access user details
+```bash
+API Method: GET
+API Endpoint: {{BASE_URL_BE}}/account/api/userdata/
+Headers:
+key: Authorization
+value: Bearer <access token>
+
+Sample Response:
+{
+    "uid": "userid",
+    "username": "username",
+    "email": "useremail@gmail.com",
+    "is_email_verified": true,
+    "is_admin": false,
+    "is_superuser": false,
+    "is_active": true,
+    "created_at": "2024-06-15T19:57:11.936165Z",
+    "updated_at": "2024-06-16T11:53:10.238012Z"
+}
 ```
