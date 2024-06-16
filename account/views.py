@@ -30,11 +30,9 @@ class RequestOTP(APIView):
 
 class VerifyOTP(APIView):
     permission_classes = (AllowAny,)
-    serializer_class = OTPVerifySerializer
     
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        # serializer = OTPVerifySerializer(data=request.data)
+        serializer = OTPVerifySerializer(data=request.data)
 
         if serializer.is_valid():
             email = serializer.validated_data['email']
