@@ -27,7 +27,7 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True) # So that it will not be returned to the user
+    password = serializers.CharField(write_only=True) # So that it will not be returned in the reponse
 
     class Meta:
         model = User
@@ -39,11 +39,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password']
         )
-
-        # Generate OTP and send email
-        otp = generate_otp()
-        OTP.objects.create(email=user.email, otp=otp)
-        send_otp_email(user.email, otp)
 
         return user
 

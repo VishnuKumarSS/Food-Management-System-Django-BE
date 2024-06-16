@@ -82,7 +82,7 @@ Body:
 ```bash
 # Create/Register User
 API Method: POST
-API Endpoint: {{BASE_URL_BE}}/account/api/register/
+API Endpoint: {{BASE_URL_BE}}/account/register/
 Body:
 {
     "username": "username",
@@ -92,7 +92,7 @@ Body:
 
 # Login User / Token Obtain
 API Method: POST
-API Endpoint: {{BASE_URL_BE}}/account/api/token/
+API Endpoint: {{BASE_URL_BE}}/account/token/
 Body:
 {
     "email": "useremail@gmail.com",
@@ -102,7 +102,7 @@ Body:
 
 # Token refresh
 API Method: POST
-API Endpoint: {{BASE_URL_BE}}/account/api/token/refresh/
+API Endpoint: {{BASE_URL_BE}}/account/token/refresh/
 Body:
 {
     "refresh": "headers.payload.signature"
@@ -112,7 +112,7 @@ Body:
 #### 4. Access user details
 ```bash
 API Method: GET
-API Endpoint: {{BASE_URL_BE}}/account/api/userdata/
+API Endpoint: {{BASE_URL_BE}}/account/userdata/
 Headers:
 key: Authorization
 value: Bearer <access token>

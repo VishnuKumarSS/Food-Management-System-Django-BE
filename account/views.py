@@ -29,9 +29,12 @@ class RequestOTP(APIView):
 
 
 class VerifyOTP(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = OTPVerifySerializer
     
     def post(self, request):
-        serializer = OTPVerifySerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
+        # serializer = OTPVerifySerializer(data=request.data)
 
         if serializer.is_valid():
             email = serializer.validated_data['email']
@@ -43,8 +46,8 @@ class VerifyOTP(APIView):
                 if user:
                     user.is_email_verified = True  # Mark email as verified
                     user.save()
-                otp_record.delete()
-                return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
+                    otp_record.delete()
+                    return Response({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
         
             return Response({'error': 'Invalid OTP or OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -55,6 +58,24 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,) # Explicitely defining the permission class
     serializer_class = RegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs) # Explicitly creating it
+        email = request.data.get('email')
+        
+        # Generate OTP and send email
+        otp = generate_otp()
+        OTP.objects.create(email=email, otp=otp)
+        send_otp_email(email, otp)
+        
+        response_dict = {
+            'message': 'User registered successfully. Please verify your email with the OTP sent.',
+            'data': response.data
+        }
+        return Response(
+            data=response_dict,
+            status=status.HTTP_201_CREATED
+        )
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
