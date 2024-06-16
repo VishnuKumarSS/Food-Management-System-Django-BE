@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from rest_framework import generics, permissions
 
-# Create your views here.
+from .models import FoodItem
+from .serializers import FoodItemSerializer
+
+
+class FoodItemListCreateView(generics.ListCreateAPIView):
+    queryset = FoodItem.objects.all()
+    serializer_class = FoodItemSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class FoodItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = FoodItem.objects.all()
+    serializer_class = FoodItemSerializer
+    permission_classes = [permissions.IsAdminUser]
