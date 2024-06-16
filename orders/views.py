@@ -24,9 +24,11 @@ class CartView(generics.RetrieveUpdateAPIView):
         cart.cartitem_set.all().delete()  # Clear existing items
         for item_data in items_data:
             food_item_id = item_data.get('food_item')
-            quantity = item_data.get('quantity', 1)
-            food_item = get_object_or_404(FoodItem, id=food_item_id)
-            CartItem.objects.create(cart=cart, food_item=food_item, quantity=quantity)
+            quantity = item_data.get('quantity', 0)
+            
+            if quantity > 0:
+                food_item = get_object_or_404(FoodItem, id=food_item_id)
+                CartItem.objects.create(cart=cart, food_item=food_item, quantity=quantity)
 
         serializer = self.get_serializer(cart)
         return Response(serializer.data)
@@ -68,14 +70,12 @@ class OrderListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        # Extract items data and pass user explicitly
-        items_data = self.request.data.get('items', [])
-        order = serializer.save(user=self.request.user)
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user) # It Hits OrderSerializer create() method.
 
-        for item_data in items_data:
-            food_item = get_object_or_404(FoodItem, id=item_data['food_item'])
-            OrderItem.objects.create(order=order, food_item=food_item, quantity=item_data['quantity'])
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AdminOrderListView(generics.ListAPIView):
