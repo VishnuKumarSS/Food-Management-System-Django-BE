@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -54,7 +54,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        print("JWT Token payload function triggered.")
+        
         # Include these keys in the JWT data
         # uid is included by default as we mentioned 'USER_ID_FIELD': 'uid' in settings.
         token['username'] = user.username
@@ -63,56 +63,41 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-    
         email = attrs.get('email')
         password = attrs.get('password')
         print('Validation Attibutes:', attrs)
-
-        if email and password:
-            user = self.get_user(email, password)
-            
-            if not user:
-                raise serializers.ValidationError("User not found with the provided credentials.")
-            
-            print("User object:", user.__dict__)
-
-            # Validate OTP, when the email is not verified
-            if not user.is_email_verified:
-                otp = attrs.get('otp')
-                
-                if not otp:
-                    raise serializers.ValidationError('otp field required.')
-
-                otp_record = OTP.objects.filter(email=email, otp=otp).first()
-                if otp_record and otp_record.is_valid_otp():
-                    user.is_email_verified = True
-                    user.save()
-                    otp_record.delete()
-                else:
-                    raise serializers.ValidationError('Invalid OTP or OTP has expired.')
-
-            data = super().validate(attrs)
-            
-            data['email'] = user.email
-            data['username'] = user.username
-            data['user_id'] = user.uid
-            
-            return data
-            
-        else:
-            raise serializers.ValidationError('email, password fields are required.')
-
-
-    def get_user(self, email, password):
-        user = None
-        if email and password:
-            user = User.objects.filter(email=email).first()
-            if user and user.check_password(password):
-                return user
-            
-            # * Or we can directly use this to get the user object
-            # from django.contrib.auth import authenticate
-            # user = authenticate(username=email, password=password)
-            # return user
         
-        return None
+        if not email or not password:
+            raise serializers.ValidationError({'error': 'email and password fields are required.'})
+        
+        # Authenticate user
+        user = authenticate(request=self.context.get('request'), username=email, password=password)
+        if not user:
+            raise serializers.ValidationError({'error': 'User not found with the provided credentials.'})
+        
+        print("User object:", user.__dict__)
+
+        # Validate OTP if email is not verified
+        if not user.is_email_verified:
+            otp = attrs.get('otp')
+            if not otp:
+                raise serializers.ValidationError({'error': 'otp field is required for unverified email.'})
+
+            otp_record = OTP.objects.filter(email=email, otp=otp).first()
+            if otp_record and otp_record.is_valid_otp():
+                user.is_email_verified = True
+                user.save()
+                otp_record.delete()
+            else:
+                raise serializers.ValidationError({'error': 'Invalid OTP or OTP has expired.'})
+
+        data = super().validate(attrs)
+        
+        # Add the required fields to be included in the response in addition to the access token and refresh token.
+        data.update({
+            'email': user.email,
+            'username': user.username,
+            'user_id': user.uid
+        })
+        
+        return data
