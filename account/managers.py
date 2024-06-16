@@ -32,6 +32,7 @@ class UserAccountManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_email_verified", True) # Setting this True, as the super user is not gonna get created without the proper access.
 
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
