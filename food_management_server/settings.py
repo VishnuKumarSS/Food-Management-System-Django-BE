@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'account',
@@ -160,3 +161,7 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'uid',
     'USER_ID_CLAIM': 'user_id', # Key name of the uid in jwt payload. Default (can be omitted)
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
