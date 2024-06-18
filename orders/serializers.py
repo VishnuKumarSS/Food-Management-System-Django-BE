@@ -23,8 +23,7 @@ class CartItemUpdateSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    # items = CartItemSerializer(many=True, source='cartitem_set')
-    items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
+    items = CartItemSerializer(many=True, source='cartitem_set', read_only=True) # cartitem_set gets the Cart models related field, cartitem_set means CartItem related field in the Cart model.
 
     class Meta:
         model = Cart
@@ -55,7 +54,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, write_only=True)
     items_list = OrderItemSerializer(many=True, source='orderitem_set', read_only=True)
 
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True) # This will use the queryset of Order as defined in the OrderListCreateView views.
 
     class Meta:
         model = Order
