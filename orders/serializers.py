@@ -39,10 +39,16 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     food_item = serializers.PrimaryKeyRelatedField(queryset=FoodItem.objects.all())
-
+    price = serializers.SerializerMethodField() # Gets the food_item price from get_price method.
+    food_name = serializers.SerializerMethodField() # Gets the food_item name from get_food_name method.
     class Meta:
         model = OrderItem
-        fields = ['id', 'food_item', 'quantity']
+        fields = ['id', 'food_item', 'quantity', 'price', 'food_name']
+    
+    def get_price(self, obj):
+        return obj.food_item.price
+    def get_food_name(self, obj):
+        return obj.food_item.name
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -72,5 +78,8 @@ class OrderSerializer(serializers.ModelSerializer):
                 food_item.save()
             
             OrderItem.objects.create(order=order, **item_data)
+        
+        # Delete the cart, as the order got placed
+        Cart.objects.filter(user=user).delete()
         
         return order

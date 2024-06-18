@@ -57,6 +57,10 @@ class AddCartItemView(generics.CreateAPIView):
             cart_item.quantity = int(quantity)
         
         cart_item.save()
+        
+        if cart_item.quantity <= 0:
+            cart_item.delete()
+        
 
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

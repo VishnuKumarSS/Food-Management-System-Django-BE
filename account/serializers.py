@@ -44,7 +44,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    otp = serializers.CharField(write_only=True, required=False, max_length=6)
+    otp = serializers.CharField(write_only=True, required=False, max_length=6, allow_blank=True)
 
     @classmethod
     def get_token(cls, user):
@@ -54,6 +54,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # uid is included by default as we mentioned 'USER_ID_FIELD': 'uid' in settings.
         token['username'] = user.username
         token['email'] = user.email
+        token['is_admin'] = user.is_admin
+        token['is_superuser'] = user.is_superuser
+        token['is_email_verified'] = user.is_email_verified
 
         return token
 
