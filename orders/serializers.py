@@ -55,11 +55,15 @@ class OrderSerializer(serializers.ModelSerializer):
     items_list = OrderItemSerializer(many=True, source='orderitem_set', read_only=True)
 
     user = serializers.PrimaryKeyRelatedField(read_only=True) # This will use the queryset of Order as defined in the OrderListCreateView views.
+    username = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'created_at', 'items_list', 'items']
-        read_only_fields = ['id', 'created_at', 'user', 'items']
+        fields = ['id', 'user', 'username', 'created_at', 'items_list', 'items']
+        read_only_fields = ['id', 'created_at', 'user', 'username', 'items']
+    
+    def get_username(self, obj):
+        return obj.user.username
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')

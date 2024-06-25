@@ -162,6 +162,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    # * Default paginator for all the views
+    # 'DEFAULT_PAGINATION_CLASS': 'food.pagination.CustomPageNumberPagination',
+    # 'PAGE_SIZE': 10, # Default page size
 }
 
 SIMPLE_JWT = {
