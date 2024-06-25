@@ -7,3 +7,6 @@ class FoodItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity_available = models.IntegerField()
     quantity_sold = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['name']
