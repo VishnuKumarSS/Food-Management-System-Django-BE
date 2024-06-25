@@ -3,6 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from food.models import FoodItem
+from food.pagination import SmallPageNumberPagination
 
 from .models import Cart, CartItem, Order, OrderItem
 from .serializers import (AddCartItemSerializer, CartItemSerializer,
@@ -70,6 +71,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = SmallPageNumberPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
@@ -86,6 +88,7 @@ class AdminOrderListView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAdminUser]
+    pagination_class = SmallPageNumberPagination
 
 
 class AdminOrderDetailView(generics.RetrieveUpdateAPIView):
